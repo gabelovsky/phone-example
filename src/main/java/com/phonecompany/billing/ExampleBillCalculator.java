@@ -9,6 +9,12 @@ import java.util.*;
 
 public class ExampleBillCalculator implements TelephoneBillCalculator {
 
+    /**
+     * Calculates total phone bill and discounts
+     *
+     * @param phoneLog - csv phone log in format number, call start time, call end time
+     * @return final charge value
+     */
     public BigDecimal calculate(String phoneLog) {
 
         List<PhoneLog> phoneCallList;
@@ -39,8 +45,8 @@ public class ExampleBillCalculator implements TelephoneBillCalculator {
             int totalMinutes = (int) Math.ceil((double) duration / (1000 * 60));
             // for simplicity's sake ignoring calls that are longer than 16 hours(multi day calls)
             int primeMinutes = getPrimeTimeMinutes(
-                    setDiscountTime(log.startTime, primeStartHour),
-                    setDiscountTime(log.endTime, primeEndHour),
+                    setPrimeTime(log.startTime, primeStartHour),
+                    setPrimeTime(log.endTime, primeEndHour),
                     log.startTime,
                     log.endTime
             );
@@ -74,6 +80,15 @@ public class ExampleBillCalculator implements TelephoneBillCalculator {
         return phoneBillMap.values().stream().map(log -> log.getCharge()).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    /**
+     * Get the number of minutes between two date intervals
+     *
+     * @param primeStart - prime start time
+     * @param primeEnd   - prime end time
+     * @param callStart  - call start time
+     * @param callEnd    - call end time
+     * @return number of minutes in the prime time
+     */
     private int getPrimeTimeMinutes(Date primeStart, Date primeEnd, Date callStart, Date callEnd) {
 
         if (callStart.after(primeEnd) || callEnd.before(primeStart)) {
@@ -86,7 +101,14 @@ public class ExampleBillCalculator implements TelephoneBillCalculator {
         return (int) Math.ceil((double) duration / (1000 * 60));
     }
 
-    private Date setDiscountTime(Date callTime, int hour) {
+    /**
+     * Set the hours of the call to the prime time(ignoring multi-day calls)
+     *
+     * @param callTime - original call time
+     * @param hour     - hour value to set
+     * @return time with the hour minute and second values overwritten
+     */
+    private Date setPrimeTime(Date callTime, int hour) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(callTime);
         calendar.set(Calendar.MILLISECOND, 0);

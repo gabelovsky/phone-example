@@ -11,6 +11,11 @@ public class PhoneBill {
         this.charge = charge;
     }
 
+    /**
+     * Increase call count and add up charge for the phone number
+     *
+     * @param charge - charge for the call
+     */
     public void addCall(BigDecimal charge) {
         this.callCount++;
         this.charge = this.charge.add(charge);
